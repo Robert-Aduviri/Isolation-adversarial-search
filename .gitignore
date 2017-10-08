@@ -3,6 +3,8 @@
 
 .ipynb_checkpoints/
 *.pyc
+*.json
+*.zip
 .udacity-pa/
 
 ### Python ###
