@@ -123,16 +123,22 @@ def play_matches(cpu_agents, test_agents, num_matches):
         print(("\nYour agents forfeited {} games while there were still " +
                "legal moves available to play.\n").format(total_forfeits))
 
+    return {x[1].name: 100 * total_wins[x[1].player] / total_matches for x in enumerate(test_agents)}
+
 
 def main():
 
     # Define two agents to compare -- these agents will play from the same
     # starting position against the same adversaries in the tournament
     test_agents = [
-        Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score), "AB_Custom"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score_2), "AB_Custom_2"),
-        Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3")
+        # Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
+        # Agent(AlphaBetaPlayer(score_fn=custom_score), "AB_Custom"),
+        # Agent(AlphaBetaPlayer(score_fn=custom_score_2), "AB_Custom_2"),
+        # Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3")
+        Agent(MinimaxPlayer(score_fn=custom_score), "MM_Custom"),
+        Agent(MinimaxPlayer(score_fn=open_move_score), "MM_Open"),
+        Agent(MinimaxPlayer(score_fn=center_score), "MM_Center"),
+        Agent(MinimaxPlayer(score_fn=improved_score), "MM_Improved"),        
     ]
 
     # Define a collection of agents to compete against the test agents
@@ -141,17 +147,23 @@ def main():
         Agent(MinimaxPlayer(score_fn=open_move_score), "MM_Open"),
         Agent(MinimaxPlayer(score_fn=center_score), "MM_Center"),
         Agent(MinimaxPlayer(score_fn=improved_score), "MM_Improved"),
-        Agent(AlphaBetaPlayer(score_fn=open_move_score), "AB_Open"),
-        Agent(AlphaBetaPlayer(score_fn=center_score), "AB_Center"),
-        Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved")
+        # Agent(AlphaBetaPlayer(score_fn=open_move_score), "AB_Open"),
+        # Agent(AlphaBetaPlayer(score_fn=center_score), "AB_Center"),
+        # Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved")
     ]
 
     print(DESCRIPTION)
     print("{:^74}".format("*************************"))
     print("{:^74}".format("Playing Matches"))
     print("{:^74}".format("*************************"))
-    play_matches(cpu_agents, test_agents, NUM_MATCHES)
-
+    return play_matches(cpu_agents, test_agents, NUM_MATCHES)
+    
+from collections import Counter
 
 if __name__ == "__main__":
-    main()
+    results = Counter()
+    NUM_TOURNAMENTS = 3
+    for tournament in range(NUM_TOURNAMENTS):
+        results.update(main())
+    results = {k: v / NUM_TOURNAMENTS for k,v in results.items()}
+    print(results)
