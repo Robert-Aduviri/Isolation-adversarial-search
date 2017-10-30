@@ -131,14 +131,15 @@ def main():
     # Define two agents to compare -- these agents will play from the same
     # starting position against the same adversaries in the tournament
     test_agents = [
-        # Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
-        # Agent(AlphaBetaPlayer(score_fn=custom_score), "AB_Custom"),
-        # Agent(AlphaBetaPlayer(score_fn=custom_score_2), "AB_Custom_2"),
-        # Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3")
-        Agent(MinimaxPlayer(score_fn=custom_score), "MM_Custom"),
+        Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved"),
+        # Agent(AlphaBetaPlayer(score_fn=custom_score, timeout=TIME_LIMIT), "AB_Custom"),
+        # Agent(AlphaBetaPlayer(score_fn=custom_score_2, timeout=TIME_LIMIT), "AB_Custom_2"),
+        Agent(AlphaBetaPlayer(score_fn=custom_score_3), "AB_Custom_3"),
+        Agent(MinimaxPlayer(score_fn=custom_score_2), "MM_Custom_2"),
+        Agent(MinimaxPlayer(score_fn=custom_score_2), "MM_Custom_3"),
         Agent(MinimaxPlayer(score_fn=open_move_score), "MM_Open"),
         Agent(MinimaxPlayer(score_fn=center_score), "MM_Center"),
-        Agent(MinimaxPlayer(score_fn=improved_score), "MM_Improved"),        
+        Agent(MinimaxPlayer(score_fn=improved_score), "MM_Improved")   
     ]
 
     # Define a collection of agents to compete against the test agents
@@ -147,9 +148,9 @@ def main():
         Agent(MinimaxPlayer(score_fn=open_move_score), "MM_Open"),
         Agent(MinimaxPlayer(score_fn=center_score), "MM_Center"),
         Agent(MinimaxPlayer(score_fn=improved_score), "MM_Improved"),
-        # Agent(AlphaBetaPlayer(score_fn=open_move_score), "AB_Open"),
-        # Agent(AlphaBetaPlayer(score_fn=center_score), "AB_Center"),
-        # Agent(AlphaBetaPlayer(score_fn=improved_score), "AB_Improved")
+        Agent(AlphaBetaPlayer(score_fn=open_move_score), "AB_Open")
+        # Agent(AlphaBetaPlayer(score_fn=center_score, timeout=TIME_LIMIT), "AB_Center"),
+        # Agent(AlphaBetaPlayer(score_fn=improved_score, timeout=TIME_LIMIT), "AB_Improved")
     ]
 
     print(DESCRIPTION)
@@ -159,11 +160,17 @@ def main():
     return play_matches(cpu_agents, test_agents, NUM_MATCHES)
     
 from collections import Counter
+import pandas as pd
 
 if __name__ == "__main__":
     results = Counter()
-    NUM_TOURNAMENTS = 3
+    NUM_TOURNAMENTS = 1
     for tournament in range(NUM_TOURNAMENTS):
         results.update(main())
     results = {k: v / NUM_TOURNAMENTS for k,v in results.items()}
-    print(results)
+    results = pd.DataFrame(list(results.items()), columns=['Player', 'Win Rate'])
+    results['Win Rate'] = results['Win Rate'].apply(lambda x: round(x, 2))
+    print()
+    print()
+    print(results.sort_values('Win Rate', ascending=False))
+
